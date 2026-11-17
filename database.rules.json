@@ -1,0 +1,69 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "students": {
+      ".read": "auth != null",
+      ".indexOn": ["course", "year", "campus", "status"],
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "studyRequests": {
+      ".read": "auth != null && query.orderByChild === 'to' && query.equalTo === auth.uid",
+      ".indexOn": ["to"],
+      "$requestId": {
+        ".read": "auth != null && (data.child('to').val() === auth.uid || data.child('from').val() === auth.uid)",
+        ".write": "auth != null && ((!data.exists() && newData.child('from').val() === auth.uid && newData.child('to').isString() && newData.child('to').val() !== auth.uid && newData.child('requestId').val() === $requestId && newData.child('status').val() === 'pending') || (data.exists() && data.child('to').val() === auth.uid && data.child('status').val() === 'pending' && newData.child('from').val() === data.child('from').val() && newData.child('to').val() === data.child('to').val() && newData.child('requestId').val() === data.child('requestId').val() && newData.child('timestamp').val() === data.child('timestamp').val() && (newData.child('status').val() === 'accepted' || newData.child('status').val() === 'rejected')))"
+      }
+    },
+    "matches": {
+      ".read": "auth != null && query.equalTo === auth.uid && (query.orderByChild === 'student1' || query.orderByChild === 'student2')",
+      ".indexOn": ["student1", "student2"],
+      "$matchId": {
+        ".read": "auth != null && (data.child('student1').val() === auth.uid || data.child('student2').val() === auth.uid)",
+        ".write": "auth != null && ((!data.exists() && (newData.child('student1').val() === auth.uid || newData.child('student2').val() === auth.uid) && newData.child('student1').val() !== newData.child('student2').val()) || (data.exists() && (data.child('student1').val() === auth.uid || data.child('student2').val() === auth.uid)))"
+      }
+    },
+    "groups": {
+      ".indexOn": ["createdBy"],
+      "$groupId": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((!data.exists() && newData.child('createdBy').val() === auth.uid && newData.child('members').child(auth.uid).exists()) || (data.exists() && (data.child('createdBy').val() === auth.uid || data.child('members').child(auth.uid).exists())))",
+        "members": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.val() === true"
+          }
+        }
+      }
+    },
+    "chats": {
+      ".read": "auth != null",
+      "$chatId": {
+        ".read": "auth != null && data.child('participants').child(auth.uid).val() === true",
+        ".write": "auth != null && ((!data.exists() && newData.child('participants').child(auth.uid).val() === true) || (data.exists() && data.child('participants').child(auth.uid).val() === true))",
+        "messages": {
+          ".indexOn": ["timestamp"],
+          "$messageId": {
+            ".read": "auth != null && root.child('chats').child($chatId).child('participants').child(auth.uid).val() === true",
+            ".write": "auth != null && root.child('chats').child($chatId).child('participants').child(auth.uid).val() === true && ((!data.exists() && newData.child('senderId').val() === auth.uid) || (data.exists() && data.child('senderId').val() === auth.uid))"
+          }
+        },
+        "unreadCount": {
+          "$uid": {
+            ".read": "auth != null && root.child('chats').child($chatId).child('participants').child(auth.uid).val() === true",
+            ".write": "auth != null && auth.uid === $uid && root.child('chats').child($chatId).child('participants').child(auth.uid).val() === true"
+          }
+        }
+      }
+    },
+    "notifications": {
+      ".read": "auth != null && query.orderByChild === 'recipient' && query.equalTo === auth.uid",
+      ".indexOn": ["recipient"],
+      "$notificationId": {
+        ".read": "auth != null && data.child('recipient').val() === auth.uid",
+        ".write": "auth != null && ((!data.exists() && newData.child('recipient').isString() && newData.child('recipient').val() !== auth.uid && newData.child('relatedId').val() === auth.uid) || (data.exists() && data.child('recipient').val() === auth.uid))"
+      }
+    }
+  }
+}

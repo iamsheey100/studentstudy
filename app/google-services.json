@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "305825878892",
+    "project_id": "aisha-2b01a",
+    "storage_bucket": "aisha-2b01a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305825878892:android:fb170cc15c425ee67a5949",
+        "android_client_info": {
+          "package_name": "com.example.studypartnerapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV2US2WoS8hANkQ37JBMgsCENNbwswvY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
